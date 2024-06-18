@@ -54,7 +54,7 @@ class BookingControllerTest {
         booking.setId(1L);
         booking.setStartDate(LocalDate.now().plusDays(1));
         booking.setEndDate(LocalDate.now().plusDays(5));
-        booking.setStatus(StatusBooking.RESCHEDULED);
+        booking.setStatus(StatusBooking.BOOKED);
         booking.setDetails("Test Booking");
         booking.setGuest(guest);
         booking.setProperty(property);
@@ -91,7 +91,7 @@ class BookingControllerTest {
 
     @Test
     void testRescheduleBooking() throws Exception {
-        when(bookingService.rescheduleBooking(anyLong(), any(BookingDTO.class))).thenReturn(booking);
+        when(bookingService.rescheduleBooking(anyLong())).thenReturn(booking);
 
         mockMvc.perform(put("/bookings/1/reschedule")
                         .contentType(MediaType.APPLICATION_JSON)

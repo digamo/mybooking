@@ -35,8 +35,8 @@ public class BookingController {
     }
 
     @PutMapping("/{id}/reschedule")
-    public ResponseEntity<Booking> rescheduleBooking(@PathVariable Long id, @RequestBody BookingDTO bookingDTO) {
-        return ResponseEntity.ok(bookingService.rescheduleBooking(id, bookingDTO));
+    public ResponseEntity<Booking> rescheduleBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(bookingService.rescheduleBooking(id));
     }
 
     @DeleteMapping("/{id}")

@@ -3,14 +3,16 @@ package com.mybooking.service;
 import com.mybooking.dto.BookingDTO;
 import com.mybooking.enums.StatusBooking;
 import com.mybooking.exception.BookingException;
+import com.mybooking.exception.Constants;
+import com.mybooking.model.Block;
 import com.mybooking.model.Booking;
 import com.mybooking.repository.BlockRepository;
 import com.mybooking.repository.BookingRepository;
-import com.mybooking.util.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -23,13 +25,12 @@ public class BookingService {
     private BlockRepository blockRepository;
 
     public Booking getBooking(Long id) {
-        return findById(id);
+        return this.findById(id);
     }
 
     public Booking createBooking(BookingDTO bookingDTO) {
-        if (isBookingOverlap(bookingDTO)) {
-            throw new BookingException(Constants.BOOKING_DATES_OVERLAP, HttpStatus.BAD_REQUEST);
-        }
+        validBooking(bookingDTO, null);
+
         Booking newBooking = new Booking();
         newBooking.setStartDate(bookingDTO.getStartDate());
         newBooking.setEndDate(bookingDTO.getEndDate());
@@ -42,9 +43,7 @@ public class BookingService {
     }
 
     public Booking updateBooking(Long id, BookingDTO bookingDTO) {
-        if (isBookingOverlap(bookingDTO)) {
-            throw new BookingException(Constants.BOOKING_DATES_OVERLAP, HttpStatus.BAD_REQUEST);
-        }
+        validBooking(bookingDTO, id);
 
         Booking updatedBooking = findById(id);
         updatedBooking.setStartDate(bookingDTO.getStartDate());
@@ -60,39 +59,48 @@ public class BookingService {
         bookingRepository.save(cancelledBooking);
     }
 
-    public Booking rescheduleBooking(Long id, BookingDTO bookingDTO) {
+    public Booking rescheduleBooking(Long id) {
         Booking rescheduledBooking = findById(id);
-        if(!StatusBooking.CANCELED.equals(bookingDTO.getStatus())) {
-            throw new BookingException("Booking is not canceled to do a rebook", HttpStatus.BAD_REQUEST);
+        if(!StatusBooking.CANCELED.equals(rescheduledBooking.getStatus())) {
+            throw new BookingException(Constants.BOOKING_NOT_CANCELED, HttpStatus.BAD_REQUEST);
         }
-
-        if (isBookingOverlap(bookingDTO)) {
-            throw new BookingException(Constants.BOOKING_DATES_OVERLAP, HttpStatus.BAD_REQUEST);
-        }
-
-        rescheduledBooking.setStartDate(bookingDTO.getStartDate());
-        rescheduledBooking.setEndDate(bookingDTO.getEndDate());
-        rescheduledBooking.setDetails(bookingDTO.getDetails());
-        rescheduledBooking.setStatus(StatusBooking.RESCHEDULED);
+        rescheduledBooking.setStatus(StatusBooking.BOOKED);
 
         return bookingRepository.save(rescheduledBooking);
     }
 
     public void deleteBooking(Long id) {
-        bookingRepository.deleteById(id);
+        Booking deletedBooking = findById(id);
+        bookingRepository.deleteById(deletedBooking.getId());
     }
 
-    private boolean isBookingOverlap(BookingDTO bookingDTO) {
-        List<Booking> overlappingBookings = bookingRepository.findOverlappingBookings(
+    public List<Booking> findBookings(BookingDTO bookingDTO) {
+        return bookingRepository.findOverlappingBookings(
                 bookingDTO.getStartDate(), bookingDTO.getEndDate(), bookingDTO.getProperty().getId());
-        if (!overlappingBookings.isEmpty()) {
-            return true;
-        }
-        return !blockRepository.findOverlappingBlocks(
-                bookingDTO.getStartDate(), bookingDTO.getEndDate(), bookingDTO.getProperty().getId()).isEmpty();
+    }
+
+    public List<Booking> findOtherBookings(BookingDTO bookingDTO, Long idBooking) {
+        return bookingRepository.findOverlappingOtherBookings(
+                bookingDTO.getStartDate(), bookingDTO.getEndDate(), bookingDTO.getProperty().getId(), idBooking);
     }
 
     private Booking findById(Long id){
-        return bookingRepository.findById(id).orElseThrow(() -> new BookingException("Block not found", HttpStatus.NOT_FOUND));
+        return bookingRepository.findById(id).orElseThrow(() -> new BookingException(Constants.BOOKING_NOT_FOUND, HttpStatus.NOT_FOUND));
+    }
+
+    private void validBooking(BookingDTO bookingDTO, Long idBooking) {
+
+        List<Block> blocks = blockRepository.findOverlappingBlocks(
+                bookingDTO.getStartDate(), bookingDTO.getEndDate(), bookingDTO.getProperty().getId());
+
+        List<Booking> bookings;
+        if(idBooking != null)
+            bookings = findOtherBookings(bookingDTO, idBooking);
+        else
+            bookings = findBookings(bookingDTO);
+
+        if (!blocks.isEmpty() || !bookings.isEmpty()) {
+            throw new BookingException(Constants.BOOKING_DATES_OVERLAP, HttpStatus.BAD_REQUEST);
+        }
     }
 }
