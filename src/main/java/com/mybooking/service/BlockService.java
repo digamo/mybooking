@@ -19,6 +19,10 @@ public class BlockService {
     @Autowired
     private BookingRepository bookingRepository;
 
+    public Block getById(Long id) {
+        return this.findById(id);
+    }
+
     public Block createBlock(BlockDTO blockDTO) {
         validBlock(blockDTO);
 
@@ -45,7 +49,7 @@ public class BlockService {
         blockRepository.delete(existingBlock);
     }
 
-    private Block findById(Long id){
+    public Block findById(Long id){
         return blockRepository.findById(id).orElseThrow(() -> new BlockException(Constants.BLOCK_NOT_FOUND, HttpStatus.NOT_FOUND));
     }
 

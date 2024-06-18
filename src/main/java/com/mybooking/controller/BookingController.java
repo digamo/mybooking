@@ -15,7 +15,7 @@ public class BookingController {
     private BookingService bookingService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> createBooking(@PathVariable Long id) {
+    public ResponseEntity<Booking> getBooking(@PathVariable Long id) {
         return ResponseEntity.ok(bookingService.getBooking(id));
     }
 

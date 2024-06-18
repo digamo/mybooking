@@ -14,6 +14,11 @@ public class BlockController {
     @Autowired
     private BlockService blockService;
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Block> getBooking(@PathVariable Long id) {
+        return ResponseEntity.ok(blockService.getById(id));
+    }
+
     @PostMapping
     public ResponseEntity<Block> createBlock(@RequestBody BlockDTO blockDTO) {
         return ResponseEntity.ok(blockService.createBlock(blockDTO));

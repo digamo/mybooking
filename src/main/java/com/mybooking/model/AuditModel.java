@@ -23,6 +23,4 @@ public abstract class AuditModel {
     @LastModifiedDate
     private LocalDateTime updateAt;
 
-    private LocalDateTime deleteAt;
-
 }

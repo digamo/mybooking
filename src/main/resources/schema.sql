@@ -18,7 +18,6 @@ CREATE TABLE booking (
     property_id BIGINT NOT NULL,
     insert_at TIMESTAMP,
     update_at TIMESTAMP,
-    delete_at TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guest(id),
     FOREIGN KEY (property_id) REFERENCES property(id)
 );
@@ -31,9 +30,9 @@ CREATE TABLE block (
     property_id BIGINT NOT NULL,
     insert_at TIMESTAMP,
     update_at TIMESTAMP,
-    delete_at TIMESTAMP,
     FOREIGN KEY (property_id) REFERENCES property(id)
 );
 
 INSERT INTO guest (name) VALUES ('Diego Gomes');
-INSERT INTO property (name) VALUES ('Test Property');
+INSERT INTO property (name) VALUES ('Test Property A');
+INSERT INTO property (name) VALUES ('Test Property B');
