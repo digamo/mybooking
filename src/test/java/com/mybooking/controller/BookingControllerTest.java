@@ -16,13 +16,13 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class BookingControllerTest {
 
@@ -44,11 +44,9 @@ class BookingControllerTest {
 
         guest = new Guest();
         guest.setId(1L);
-        guest.setName("John Doe");
 
         property = new Property();
         property.setId(1L);
-        property.setName("Sample Property");
 
         booking = new Booking();
         booking.setId(1L);
@@ -64,18 +62,18 @@ class BookingControllerTest {
     void testCreateBooking() throws Exception {
         when(bookingService.createBooking(any(BookingDTO.class))).thenReturn(booking);
 
-        mockMvc.perform(post("/bookings")
+        mockMvc.perform(post("/booking")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"details\": \"Test Booking\", \"guest\": {\"id\": 1}, \"property\": {\"id\": 1} }"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("RESCHEDULED"));
+                .andExpect(jsonPath("$.status").value("BOOKED"));
     }
 
     @Test
     void testUpdateBooking() throws Exception {
         when(bookingService.updateBooking(anyLong(), any(BookingDTO.class))).thenReturn(booking);
 
-        mockMvc.perform(put("/bookings/1")
+        mockMvc.perform(put("/booking/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"details\": \"Test Booking\", \"guest\": {\"id\": 1}, \"property\": {\"id\": 1} }"))
                 .andExpect(status().isOk())
@@ -84,16 +82,20 @@ class BookingControllerTest {
 
     @Test
     void testCancelBooking() throws Exception {
-        mockMvc.perform(put("/bookings/1/cancel")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        when(bookingService.cancelBooking(anyLong())).thenReturn(booking);
+
+        mockMvc.perform(put("/booking/1/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"details\": \"Test Booking\", \"guest\": {\"id\": 1}, \"property\": {\"id\": 1} }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
     }
 
     @Test
     void testRescheduleBooking() throws Exception {
         when(bookingService.rescheduleBooking(anyLong())).thenReturn(booking);
 
-        mockMvc.perform(put("/bookings/1/reschedule")
+        mockMvc.perform(put("/booking/1/reschedule")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"details\": \"Test Booking\", \"guest\": {\"id\": 1}, \"property\": {\"id\": 1} }"))
                 .andExpect(status().isOk())
@@ -102,7 +104,7 @@ class BookingControllerTest {
 
     @Test
     void testDeleteBooking() throws Exception {
-        mockMvc.perform(delete("/bookings/1")
+        mockMvc.perform(delete("/booking/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }

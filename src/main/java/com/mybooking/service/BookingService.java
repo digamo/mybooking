@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -53,10 +52,10 @@ public class BookingService {
         return bookingRepository.save(updatedBooking);
     }
 
-    public void cancelBooking(Long id) {
+    public Booking cancelBooking(Long id) {
         Booking cancelledBooking = findById(id);
         cancelledBooking.setStatus(StatusBooking.CANCELED);
-        bookingRepository.save(cancelledBooking);
+        return bookingRepository.save(cancelledBooking);
     }
 
     public Booking rescheduleBooking(Long id) {

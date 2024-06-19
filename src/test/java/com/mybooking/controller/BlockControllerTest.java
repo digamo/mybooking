@@ -40,7 +40,6 @@ class BlockControllerTest {
 
         property = new Property();
         property.setId(1L);
-        property.setName("Sample Property");
 
         block = new Block();
         block.setId(1L);
@@ -54,7 +53,7 @@ class BlockControllerTest {
     void testCreateBlock() throws Exception {
         when(blockService.createBlock(any(BlockDTO.class))).thenReturn(block);
 
-        mockMvc.perform(post("/blocks")
+        mockMvc.perform(post("/block")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"reason\": \"Maintenance\", \"property\": {\"id\": 1} }"))
                 .andExpect(status().isOk());
@@ -64,7 +63,7 @@ class BlockControllerTest {
     void testUpdateBlock() throws Exception {
         when(blockService.updateBlock(anyLong(), any(BlockDTO.class))).thenReturn(block);
 
-        mockMvc.perform(put("/blocks/1")
+        mockMvc.perform(put("/block/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ \"startDate\": \"2024-06-15\", \"endDate\": \"2024-06-20\", \"reason\": \"Maintenance\", \"property\": {\"id\": 1} }"))
                 .andExpect(status().isOk())
@@ -73,7 +72,7 @@ class BlockControllerTest {
 
     @Test
     void testDeleteBlock() throws Exception {
-        mockMvc.perform(delete("/blocks/1")
+        mockMvc.perform(delete("/block/1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
