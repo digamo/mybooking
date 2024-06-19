@@ -269,4 +269,3 @@ Delete a booking from an ID
 ### - OpenAPI REST Docs <a name = "docs"></a>
 
 Available in [http://localhost:8080/swagger-ui/index.html](http://localhost:8080/swagger-ui/index.html)
->>>>>>> test
