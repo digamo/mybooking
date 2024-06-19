@@ -1,6 +1,5 @@
 package com.mybooking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.mybooking.enums.StatusBooking;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,12 +26,10 @@ public class Booking extends AuditModel {
     private String details;
     @ManyToOne
     @JoinColumn(name = "guest_id")
-    @JsonIgnore
     private Guest guest;
 
     @ManyToOne
     @JoinColumn(name = "property_id")
-    @JsonIgnore
     private Property property;
 
 }

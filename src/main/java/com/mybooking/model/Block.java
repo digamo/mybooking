@@ -1,8 +1,10 @@
 package com.mybooking.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
@@ -23,7 +25,6 @@ public class Block extends AuditModel {
     private String reason;
     @ManyToOne
     @JoinColumn(name = "property_id")
-    @JsonIgnore
     private Property property;
 
 }
